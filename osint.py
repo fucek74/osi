@@ -10,7 +10,7 @@ import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 
-API_KEY = "YOUR_TELEGRAM_BOT_API_KEY"
+API_KEY = "8011469894:AAHpejaUd-JIzuRKHM6jcyzTcyLNw5lRxTc"
 
 # Banner
 BANNER = """
