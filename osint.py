@@ -1,9 +1,10 @@
 import os
 import requests
 import time
+import random
 import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 
 API_KEY = "7873607598:AAFnauDKdOQGiaYzb2PIuXe5G65UwCSoCrE"
 
@@ -126,14 +127,7 @@ async def iplookup(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         r = requests.get(f"http://ip-api.com/json/{ip}")
         data = r.json()
-        result = (
-            f"🌍 IP Lookup Result:\n"
-            f"🔹 IP: {ip}\n"
-            f"📍 Country: {data['country']}\n"
-            f"🏙 City: {data['city']}\n"
-            f"🌐 ISP: {data['isp']}\n"
-            f"🛰 Lat/Long: {data['lat']}, {data['lon']}"
-        )
+        result = f"🌍 IP Lookup Result:\n🔹 IP: {ip}\n📍 Country: {data['country']}\n🏙 City: {data['city']}\n🌐 ISP: {data['isp']}\n🛰 Lat/Long: {data['lat']}, {data['lon']}"
     except Exception as e:
         result = f"Error: {str(e)}"
 
@@ -141,7 +135,7 @@ async def iplookup(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ===================== MAIN =====================
 def main():
-    app = Application.builder().token(API_KEY).build()
+    app = ApplicationBuilder().token(API_KEY).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
